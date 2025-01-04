@@ -3,25 +3,22 @@ name: "Publish : Blog"
 on:
   push:
     branches: [ master ]
+    paths:
+      - "packages/noco-blog/**"
 
 jobs:
   copy-file:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Check for update
-        run: |
-          echo "CHANGED=$([[ $(lerna ls --since ${{github.event.before}} | grep noco-blog) = noco-blog ]] && echo 'OK')" >> $GITHUB_ENV
 
-      - uses: actions/setup-node@v2
-        if: ${{ env.CHANGED == 'OK' }}
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 22.12.0
       - name: Build blogs
-        if: ${{ env.CHANGED == 'OK' }}
         run: |
           cd packages/noco-blog
           npm install
@@ -29,11 +26,11 @@ jobs:
 
 
       - name: Pushes generated output
-        if: ${{ env.CHANGED == 'OK' }}
-        uses: dmnemec/copy_file_to_another_repo_action@main
+        uses: dmnemec/copy_file_to_another_repo_action@1b29cbd9a323185f20b175dc6d5f8f31be5c0658
         env:
           API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN }}
         with:
+          clear_folder: 'docs/dist'
           source_file: 'packages/noco-blog/dist/'
           destination_repo: 'nocodb/noco-blog'
           destination_folder: 'docs'

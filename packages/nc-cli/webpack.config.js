@@ -3,7 +3,7 @@ const nodeExternals = require('webpack-node-externals');
 //
 // const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
-const JavaScriptObfuscator = require('webpack-obfuscator');
+// const JavaScriptObfuscator = require('webpack-obfuscator');
 const path = require('path');
 module.exports = {
   entry: './src/index.ts',
@@ -42,28 +42,7 @@ module.exports = {
   //   fs: 'empty'
   // },
   plugins: [
-
-    new JavaScriptObfuscator({
-      rotateStringArray: true,
-      splitStrings: true,
-      splitStringsChunkLength: 6
-    }, []),
-
     new webpack.BannerPlugin({banner: "#! /usr/bin/env node", raw: true}),
-    // new CopyPlugin({
-    //   patterns: [
-    //     // {
-    //     //   from: "src/sample-db/chinook.sqlite",
-    //     //   to: 'chinook.sqlite',
-    //     //   // flatten: true,
-    //     // },
-    //     {
-    //       from: "src/sample-db/sakila.db",
-    //       to: 'sakila.db',
-    //       // flatten: true,
-    //     },
-    //   ],
-    // })
   ],
 
   target: 'node',

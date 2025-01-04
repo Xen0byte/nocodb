@@ -1,42 +1,37 @@
 name: "Publish : Docs"
 
 on:
-  push:
-    branches: [ master ]
-  release:
-    types: [ published ]
+  # Triggered manually
+  workflow_dispatch:
+  # Triggered by release-nocodb.yml
+  workflow_call:
+    secrets:
+      GH_TOKEN:
+        required: true
 
 jobs:
   copy-file:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Check for update
-        run: |
-          echo "CHANGED=$([[ $(lerna ls --since ${{github.event.before}} | grep noco-docs) = noco-docs ]] && echo 'OK')" >> $GITHUB_ENV
-
-      - uses: actions/setup-node@v2
-        if: ${{ env.CHANGED == 'OK' }}
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 22.12.0
       - name: Build docs
-        if: ${{ env.CHANGED == 'OK' || github.event_name == 'release' }}
         run: |
           cd packages/noco-docs
           npm install
           npm run generate
-
-
       - name: Pushes generated output
-        if: ${{ env.CHANGED == 'OK' || github.event_name == 'release' }}
-        uses: dmnemec/copy_file_to_another_repo_action@main
+        uses: dmnemec/copy_file_to_another_repo_action@1b29cbd9a323185f20b175dc6d5f8f31be5c0658
         env:
           API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN }}
         with:
           source_file: 'packages/noco-docs/dist/'
+          clear_folder: 'docs/dist'
           destination_repo: 'nocodb/noco-docs'
           destination_folder: 'docs'
           user_email: 'oof1lab@gmail.com'
